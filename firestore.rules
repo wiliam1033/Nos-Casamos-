@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net: Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isValidId(id) { 
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
+    }
+
+    // Validation Blueprint for RSVP submissions
+    function isValidRsvp(data) {
+      return data.keys().hasAll(['firstName', 'lastName', 'attending', 'createdAt'])
+        && data.keys().size() == 4
+        && data.firstName is string
+        && data.firstName.size() > 0
+        && data.firstName.size() <= 100
+        && data.lastName is string
+        && data.lastName.size() > 0
+        && data.lastName.size() <= 100
+        && (data.attending == 'si' || data.attending == 'no')
+        && data.createdAt == request.time;
+    }
+
+    match /rsvps/{rsvpId} {
+      // Allow any guest to submit their RSVP with rigorous structural validation
+      allow create: if isValidId(rsvpId) && isValidRsvp(request.resource.data);
+      
+      // Allow single document lookups to prevent duplicates
+      allow get: if isValidId(rsvpId);
+      
+      // Allow list and delete (for potential admin dashboards)
+      allow list, delete: if true;
+      allow update: if false;
+    }
+
+    // Rules for master authorized guest list
+    match /invitados_autorizados/{guestId} {
+      // Allow reading authorized guests to check their status
+      allow read: if true;
+      
+      // Allow adding, updating, or deleting from the authorized list (admin/maker usage)
+      allow write: if true;
+    }
+  }
+}
