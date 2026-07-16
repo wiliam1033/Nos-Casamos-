@@ -44,8 +44,8 @@ export const MusicPlayer = () => {
 
   return (
     <>
-      {/* El archivo se buscará en public/music.mp3 */}
-      <audio ref={audioRef} src="/music.mp3" loop preload="auto" />
+      {/* Usar import.meta.env.BASE_URL asegura que funcione en subdirectorios como GitHub Pages */}
+      <audio ref={audioRef} src={`${import.meta.env.BASE_URL}music.mp3`} loop preload="auto" />
       
       <motion.button
         initial={{ opacity: 0, scale: 0.8 }}
