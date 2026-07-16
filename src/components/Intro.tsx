@@ -34,6 +34,7 @@ export const Intro = ({ onComplete }: IntroProps) => {
 
   const handleOpen = () => {
     if (step !== 1) return;
+    document.dispatchEvent(new CustomEvent('play-music'));
     setStep(2);
     setTimeout(() => setStep(3), 800);
     setTimeout(() => setStep(4), 2000);

@@ -15,6 +15,7 @@ export const Cover = ({ onNext }: CoverProps) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 1 }}
+      onClick={() => document.dispatchEvent(new CustomEvent('play-music'))}
     >
       {/* Background Image Container */}
       <div 
@@ -64,7 +65,10 @@ export const Cover = ({ onNext }: CoverProps) => {
           </h1>
           
           <button 
-            onClick={onNext}
+            onClick={(e) => {
+              e.stopPropagation();
+              onNext();
+            }}
             className="mt-4 bg-gradient-to-r from-[#dfa856] to-[#b3853f] text-white font-sans font-bold tracking-[0.2em] text-[11px] md:text-xs uppercase px-10 py-4 rounded-full hover:shadow-[0_8px_25px_rgba(223,168,86,0.4)] transition-all duration-300 active:scale-95 border border-white/20 shadow-lg"
           >
             Ver Invitación
