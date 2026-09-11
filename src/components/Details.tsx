@@ -159,37 +159,74 @@ export const Details = ({ onRSVP }: DetailsProps) => {
               <Butterfly className="absolute bottom-2 -left-2 text-[#b3853f]" delay={3.0} duration={11} scale={0.4} />
             </motion.div>
 
-            {/* RSVP Button */}
+            {/* Cupos Cerrados / Confirmación Caducada */}
             <motion.div 
               className="w-full flex flex-col items-center mt-6 relative z-20"
-              initial={{ opacity: 0, y: 50, scale: 0.5 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true }} transition={{ delay: 0.8, duration: 0.6, type: "spring", bounce: 0.5 }}
+              initial={{ opacity: 0, y: 30 }} 
+              whileInView={{ opacity: 1, y: 0 }} 
+              viewport={{ once: true }} 
+              transition={{ delay: 0.8, duration: 0.6, type: "spring", bounce: 0.3 }}
             >
-              <button 
-                onClick={onRSVP}
-                className="relative group overflow-hidden flex items-center gap-3 bg-gradient-to-br from-[#dfa856] via-[#e8c386] to-[#b3853f] text-[#2a1f1a] px-8 py-4 rounded-full font-sans font-bold uppercase tracking-[0.15em] text-sm transition-all hover:scale-105 active:scale-95 shadow-[0_10px_25px_rgba(223,168,86,0.4)] border border-white/30 cursor-pointer"
-              >
-                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                <MessageCircle size={20} className="relative z-10" />
-                <span className="relative z-10">Confirmar Asistencia</span>
-              </button>
-              <motion.div 
-                className="mt-6 w-full max-w-sm border-2 border-red-500 bg-red-50/40 p-4 rounded-xl text-center relative z-20 shadow-sm flex flex-col gap-1.5 border-dashed"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-              >
-                <span className="font-sans text-[9px] uppercase tracking-[0.25em] text-red-600 font-extrabold">
-                  Nota Importante
+              <div className="w-full max-w-sm rounded-2xl bg-gradient-to-b from-[#fbf8f3] to-[#f4ebe0] border border-[#dfa856]/40 p-6 sm:p-7 shadow-[0_15px_35px_rgba(42,31,26,0.08)] relative overflow-hidden text-center flex flex-col items-center">
+                {/* Decorative background glow */}
+                <div className="absolute -top-10 -right-10 w-24 h-24 bg-[#dfa856]/10 rounded-full blur-xl pointer-events-none" />
+                <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-[#dfa856]/10 rounded-full blur-xl pointer-events-none" />
+
+                {/* Badge */}
+                <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#dfa856]/15 border border-[#dfa856]/30 mb-3">
+                  <Clock size={12} className="text-[#b3853f]" />
+                  <span className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#b3853f] font-bold">
+                    Tiempo Concluido
+                  </span>
+                </div>
+
+                <span className="font-script text-3xl sm:text-4xl text-[#dfa856] block">
+                  Cupos Cerrados
                 </span>
-                <p className="font-serif text-[#2a1f1a] font-bold text-sm">
-                  Favor confirmar asistencia antes del <span className="text-red-600 text-base font-extrabold block">30 de Agosto 2026</span>
+                <h3 className="font-serif text-xl sm:text-2xl text-[#2a1f1a] font-bold tracking-tight mt-0.5 mb-2.5">
+                  Confirmación Finalizada
+                </h3>
+
+                {/* Decorative divider */}
+                <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-[#dfa856] to-transparent mb-3.5" />
+
+                <p className="font-serif italic text-[#2a1f1a]/85 text-[14px] leading-relaxed mb-5 px-1">
+                  Agradecemos con el corazón todo su aprecio. El tiempo de confirmación ha caducado y el administrador ha cerrado los cupos para este evento.
                 </p>
-                <div className="h-[1px] bg-red-200/60 w-3/4 mx-auto my-0.5" />
-                <p className="font-serif italic text-red-700 font-bold text-[13px] leading-relaxed">
-                  * Código de Vestimenta: No ir vestido ni de negro ni de blanco
-                </p>
-              </motion.div>
+
+                {/* WhatsApp Contact Box */}
+                <div className="w-full bg-white/80 backdrop-blur-sm border border-[#dfa856]/30 rounded-xl p-4 flex flex-col items-center gap-2.5 shadow-sm">
+                  <p className="font-sans text-xs text-[#2a1f1a]/75 font-medium">
+                    ¿Tienes alguna duda o consulta?
+                  </p>
+
+                  <a 
+                    href="https://wa.me/50662562000?text=%C2%A1Hola%20%C3%81mbar!%20Te%20escribo%20con%20respecto%20a%20la%20invitaci%C3%B3n%20de%20la%20boda."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-2.5 bg-gradient-to-r from-[#25D366] via-[#22c55e] to-[#128C7E] text-white py-3 px-4 rounded-full font-sans font-bold uppercase tracking-[0.1em] text-[11px] sm:text-xs transition-all duration-300 hover:shadow-[0_8px_25px_rgba(37,211,102,0.35)] hover:scale-[1.02] active:scale-95 shadow-md border border-white/30"
+                  >
+                    <MessageCircle size={17} className="shrink-0" />
+                    <span>Escríbenos al WhatsApp de Ámbar Obando</span>
+                  </a>
+
+                  <span className="font-sans text-[11px] text-[#2a1f1a]/50">
+                    WhatsApp: +506 6256-2000
+                  </span>
+                </div>
+
+                {/* Dress Code Reminder */}
+                <div className="mt-4 pt-3.5 border-t border-[#dfa856]/20 w-full flex flex-col items-center gap-1">
+                  <span className="font-sans text-[9px] uppercase tracking-[0.25em] text-[#b3853f] font-extrabold">
+                    Código de Vestimenta
+                  </span>
+                  <p className="font-serif italic text-red-700 font-bold text-xs sm:text-[13px]">
+                    * Recordatorio: No ir vestido ni de negro ni de blanco
+                  </p>
+                </div>
+
+                <Butterfly className="absolute -bottom-2 -right-2 text-[#dfa856]" delay={1.2} duration={9} scale={0.45} />
+              </div>
             </motion.div>
           </div>
           

@@ -1,65 +1,12 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import { Butterfly } from "./Butterfly";
-import { saveRSVP, checkRSVPExists, checkGuestIsAuthorized } from "../lib/firebase";
-import { ArrowLeft, Check, AlertCircle, Sparkles, MessageCircle, HelpCircle } from "lucide-react";
+import { ArrowLeft, Clock, MessageCircle } from "lucide-react";
 
 interface RSVPFormProps {
   onBack: () => void;
 }
 
 export const RSVPForm = ({ onBack }: RSVPFormProps) => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [secondLastName, setSecondLastName] = useState("");
-  const [attending, setAttending] = useState<"si" | "no">("si");
-  const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [alreadyExists, setAlreadyExists] = useState(false);
-  const [notAuthorized, setNotAuthorized] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!firstName.trim() || !lastName.trim() || !secondLastName.trim()) {
-      setError("Por favor, completa tu nombre y ambos apellidos.");
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      // First, check if authorized guest
-      const authorized = await checkGuestIsAuthorized(firstName, lastName, secondLastName);
-      if (!authorized) {
-        setNotAuthorized(true);
-        setLoading(false);
-        return;
-      }
-
-      const exists = await checkRSVPExists(firstName, lastName, secondLastName);
-      if (exists) {
-        setAlreadyExists(true);
-        setLoading(false);
-        return;
-      }
-
-      await saveRSVP({
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        secondLastName: secondLastName.trim(),
-        attending,
-      });
-      setSubmitted(true);
-    } catch (err) {
-      console.error(err);
-      setError("Ocurrió un error al enviar tu respuesta. Por favor intenta de nuevo.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -102,299 +49,75 @@ export const RSVPForm = ({ onBack }: RSVPFormProps) => {
           <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-[#dfa856]/40 m-4" />
 
           {/* Back Button */}
-          {!submitted && !alreadyExists && !notAuthorized && (
+          <button
+            onClick={onBack}
+            className="absolute top-6 left-6 text-[#2a1f1a]/70 hover:text-[#b3853f] transition-colors flex items-center gap-1.5 text-xs uppercase tracking-wider font-semibold group cursor-pointer z-30"
+          >
+            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+            <span>Volver</span>
+          </button>
+
+          <div className="flex flex-col items-center mt-6 text-center relative z-10">
+            {/* Clock Badge Icon */}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 12 }}
+              className="w-16 h-16 rounded-full bg-gradient-to-br from-[#dfa856]/20 to-[#b3853f]/10 border border-[#dfa856]/40 flex items-center justify-center text-[#b3853f] shadow-inner mb-4"
+            >
+              <Clock size={30} />
+            </motion.div>
+
+            {/* Header */}
+            <span className="font-script text-3xl sm:text-4xl text-[#dfa856] block mb-1">Cupos Cerrados</span>
+            <h2 className="font-serif text-2xl sm:text-3xl text-[#2a1f1a] font-bold tracking-tight">
+              Confirmación Finalizada
+            </h2>
+            <div className="w-16 h-[1px] bg-[#dfa856]/50 mx-auto mt-3 mb-5" />
+
+            <p className="font-serif italic text-[#2a1f1a]/85 text-[15px] leading-relaxed mb-6 max-w-xs">
+              El tiempo para confirmar asistencia ha caducado y los cupos han sido cerrados por el administrador. ¡Agradecemos inmensamente su cariño y comprensión!
+            </p>
+
+            {/* WhatsApp Contact Box */}
+            <div className="w-full bg-white/85 border border-[#dfa856]/35 rounded-2xl p-5 shadow-sm flex flex-col items-center gap-3 mb-6">
+              <p className="font-sans text-xs text-[#2a1f1a]/80 font-semibold">
+                Cualquier duda o consulta, contáctanos directamente:
+              </p>
+
+              <a 
+                href="https://wa.me/50662562000?text=%C2%A1Hola%20%C3%81mbar!%20Te%20escribo%20con%20respecto%20a%20la%20invitaci%C3%B3n%20de%20la%20boda."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-center gap-2.5 bg-gradient-to-r from-[#25D366] via-[#22c55e] to-[#128C7E] text-white py-3.5 px-4 rounded-full font-sans font-bold uppercase tracking-[0.1em] text-xs transition-all duration-300 hover:shadow-[0_8px_25px_rgba(37,211,102,0.35)] hover:scale-[1.02] active:scale-95 shadow-md border border-white/30"
+              >
+                <MessageCircle size={18} className="shrink-0" />
+                <span>WhatsApp de Ámbar Obando</span>
+              </a>
+
+              <span className="font-sans text-[11px] text-[#2a1f1a]/50">
+                +506 6256-2000
+              </span>
+            </div>
+
+            {/* Dress code reminder */}
+            <div className="w-full py-3 px-4 rounded-xl bg-[#dfa856]/5 border border-[#dfa856]/20 mb-6">
+              <span className="font-sans text-[9px] uppercase tracking-[0.25em] text-[#b3853f] font-extrabold block mb-0.5">
+                Código de Vestimenta
+              </span>
+              <p className="font-serif italic text-red-700 font-bold text-xs">
+                * Recordatorio: No ir vestido ni de negro ni de blanco
+              </p>
+            </div>
+
+            {/* Back Button */}
             <button
               onClick={onBack}
-              className="absolute top-6 left-6 text-[#2a1f1a]/70 hover:text-[#b3853f] transition-colors flex items-center gap-1.5 text-xs uppercase tracking-wider font-semibold group cursor-pointer z-30"
+              className="border-2 border-[#dfa856] text-[#b3853f] hover:bg-[#dfa856] hover:text-[#2a1f1a] transition-all duration-300 font-sans font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-full cursor-pointer shadow-sm active:scale-95"
             >
-              <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-              <span>Volver</span>
+              Regresar a la Invitación
             </button>
-          )}
-
-          <AnimatePresence mode="wait">
-            {!submitted && !alreadyExists && !notAuthorized ? (
-              <motion.div
-                key="form"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.4 }}
-                className="flex flex-col items-center mt-6 relative z-10"
-              >
-                {/* Header */}
-                <div className="text-center mb-8">
-                  <span className="font-script text-3xl text-[#dfa856] block mb-1">Confirmación</span>
-                  <h2 className="font-serif text-3xl text-[#2a1f1a] font-bold tracking-tight">De Asistencia</h2>
-                  <div className="w-16 h-[1px] bg-[#dfa856]/50 mx-auto mt-3" />
-                </div>
-
-                <form onSubmit={handleSubmit} className="w-full flex flex-col gap-5">
-                  {/* First Name Field */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#b3853f] font-bold">
-                      Nombre
-                    </label>
-                    <input
-                      type="text"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      placeholder="Ej. María"
-                      maxLength={100}
-                      disabled={loading}
-                      className="w-full bg-[#fdfaf6] border border-[#2a1f1a]/15 rounded-md px-4 py-3 font-serif text-[#2a1f1a] placeholder:text-[#2a1f1a]/30 focus:outline-none focus:border-[#dfa856] focus:ring-1 focus:ring-[#dfa856] transition-all duration-300 shadow-inner"
-                    />
-                  </div>
-
-                  {/* Last Name Field */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#b3853f] font-bold">
-                      Primer Apellido
-                    </label>
-                    <input
-                      type="text"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      placeholder="Ej. Pérez"
-                      maxLength={100}
-                      disabled={loading}
-                      className="w-full bg-[#fdfaf6] border border-[#2a1f1a]/15 rounded-md px-4 py-3 font-serif text-[#2a1f1a] placeholder:text-[#2a1f1a]/30 focus:outline-none focus:border-[#dfa856] focus:ring-1 focus:ring-[#dfa856] transition-all duration-300 shadow-inner"
-                    />
-                  </div>
-
-                  {/* Second Last Name Field */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#b3853f] font-bold">
-                      Segundo Apellido
-                    </label>
-                    <input
-                      type="text"
-                      value={secondLastName}
-                      onChange={(e) => setSecondLastName(e.target.value)}
-                      placeholder="Ej. García"
-                      maxLength={100}
-                      disabled={loading}
-                      className="w-full bg-[#fdfaf6] border border-[#2a1f1a]/15 rounded-md px-4 py-3 font-serif text-[#2a1f1a] placeholder:text-[#2a1f1a]/30 focus:outline-none focus:border-[#dfa856] focus:ring-1 focus:ring-[#dfa856] transition-all duration-300 shadow-inner"
-                    />
-                  </div>
-
-                  {/* Attendance Switch Field */}
-                  <div className="flex flex-col gap-2.5 mt-2">
-                    <label className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#b3853f] font-bold text-center">
-                      ¿Nos acompañarás en este día tan especial?
-                    </label>
-                    
-                    <div className="grid grid-cols-2 gap-3 mt-1">
-                      {/* YES BUTTON */}
-                      <button
-                        type="button"
-                        onClick={() => setAttending("si")}
-                        disabled={loading}
-                        className={`py-3.5 rounded-lg border-2 font-sans font-bold text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer ${
-                          attending === "si"
-                            ? "bg-[#dfa856]/10 border-[#dfa856] text-[#b3853f] shadow-md scale-[1.02]"
-                            : "border-[#2a1f1a]/15 text-[#2a1f1a]/60 hover:border-[#dfa856]/50 hover:text-[#2a1f1a]"
-                        }`}
-                      >
-                        <div className={`w-3 h-3 rounded-full flex items-center justify-center border ${attending === 'si' ? 'border-[#dfa856]' : 'border-gray-300'}`}>
-                          {attending === "si" && <div className="w-1.5 h-1.5 rounded-full bg-[#dfa856]" />}
-                        </div>
-                        Sí, asistiré
-                      </button>
-
-                      {/* NO BUTTON */}
-                      <button
-                        type="button"
-                        onClick={() => setAttending("no")}
-                        disabled={loading}
-                        className={`py-3.5 rounded-lg border-2 font-sans font-bold text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer ${
-                          attending === "no"
-                            ? "bg-red-50 border-red-300 text-red-700 shadow-md scale-[1.02]"
-                            : "border-[#2a1f1a]/15 text-[#2a1f1a]/60 hover:border-red-300/50 hover:text-[#2a1f1a]"
-                        }`}
-                      >
-                        <div className={`w-3 h-3 rounded-full flex items-center justify-center border ${attending === 'no' ? 'border-red-400' : 'border-gray-300'}`}>
-                          {attending === "no" && <div className="w-1.5 h-1.5 rounded-full bg-red-600" />}
-                        </div>
-                        No podré asistir
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Error Message block */}
-                  {error && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs font-serif flex items-start gap-2"
-                    >
-                      <AlertCircle size={16} className="shrink-0 mt-0.5" />
-                      <span>{error}</span>
-                    </motion.div>
-                  )}
-
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full mt-2 relative group overflow-hidden flex items-center justify-center gap-2 bg-gradient-to-br from-[#dfa856] via-[#e8c386] to-[#b3853f] text-[#2a1f1a] py-4 rounded-full font-sans font-bold uppercase tracking-[0.15em] text-xs transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-[0_10px_25px_rgba(223,168,86,0.3)] border border-white/20 cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
-                  >
-                    {loading ? (
-                      <span className="flex items-center gap-2">
-                        <svg className="animate-spin h-4 w-4 text-[#2a1f1a]" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                        </svg>
-                        Guardando...
-                      </span>
-                    ) : (
-                      <>
-                        <Sparkles size={16} />
-                        <span>Confirmar</span>
-                      </>
-                    )}
-                  </button>
-                </form>
-              </motion.div>
-            ) : notAuthorized ? (
-              <motion.div
-                key="not-authorized"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, type: "spring" }}
-                className="flex flex-col items-center text-center py-6 z-10 w-full"
-              >
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 10 }}
-                  className="w-16 h-16 rounded-full bg-[#dfa856]/15 flex items-center justify-center text-[#b3853f] shadow-inner mb-6 border border-[#dfa856]/30"
-                >
-                  <HelpCircle size={32} />
-                </motion.div>
-
-                <span className="font-script text-3xl text-[#dfa856] block mb-1">Lo sentimos</span>
-                <h3 className="font-serif text-2xl text-[#2a1f1a] font-bold tracking-tight mb-4">
-                  No estás en la lista
-                </h3>
-                
-                <p className="font-serif italic text-[#2a1f1a]/80 text-[15px] leading-relaxed max-w-xs mb-8">
-                  No logramos encontrar el nombre <strong className="text-[#2a1f1a]">{firstName} {lastName} {secondLastName}</strong> en nuestra lista oficial de invitados.
-                  <span className="block mt-3 text-xs not-italic text-[#2a1f1a]/60 font-sans">
-                    Asegúrate de escribirlo exactamente como aparece en tu invitación, respetando tildes y ortografía.
-                  </span>
-                </p>
-
-                <div className="flex flex-col gap-4 w-full">
-                  <a 
-                    href={`https://wa.me/50662562000?text=%C2%A1Hola!%20Trat%C3%A9%20de%20confirmar%20mi%20asistencia%20como%20${encodeURIComponent(firstName + ' ' + lastName + ' ' + secondLastName)}%20pero%20no%20me%20encuentro%20en%20la%20lista%20de%20invitados%20autorizados.`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="relative group overflow-hidden flex items-center justify-center gap-3 bg-gradient-to-br from-[#dfa856] via-[#e8c386] to-[#b3853f] text-[#2a1f1a] py-4 rounded-full font-sans font-bold uppercase tracking-[0.15em] text-xs transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-[0_10px_25px_rgba(223,168,86,0.3)] border border-white/20 cursor-pointer text-center"
-                  >
-                    <MessageCircle size={18} />
-                    <span>Contactarnos por WhatsApp</span>
-                  </a>
-
-                  <button
-                    onClick={() => {
-                      setNotAuthorized(false);
-                      setFirstName("");
-                      setLastName("");
-                      setSecondLastName("");
-                    }}
-                    className="border-2 border-[#dfa856]/40 text-[#b3853f] hover:bg-[#dfa856]/10 transition-all duration-300 font-sans font-bold text-xs uppercase tracking-widest py-3.5 rounded-full cursor-pointer"
-                  >
-                    Intentar de nuevo
-                  </button>
-                </div>
-              </motion.div>
-            ) : alreadyExists ? (
-              <motion.div
-                key="already-exists"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, type: "spring" }}
-                className="flex flex-col items-center text-center py-6 z-10 w-full"
-              >
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 10 }}
-                  className="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center text-white shadow-lg mb-6"
-                >
-                  <AlertCircle size={32} />
-                </motion.div>
-
-                <span className="font-script text-3xl text-red-600 block mb-1">Nota</span>
-                <h3 className="font-serif text-2xl text-[#2a1f1a] font-bold tracking-tight mb-4">
-                  Ya has respondido
-                </h3>
-                
-                <p className="font-serif italic text-[#2a1f1a]/80 text-[15px] leading-relaxed max-w-xs mb-8">
-                  Usted ya llenó el formulario para <strong className="text-[#2a1f1a]">{firstName} {lastName}</strong>. Por favor, envíenos un mensaje de WhatsApp si necesita realizar algún cambio.
-                </p>
-
-                <div className="flex flex-col gap-4 w-full">
-                  <a 
-                    href={`https://wa.me/50662562000?text=%C2%A1Hola!%20Ya%20llen%C3%A9%20el%20formulario%20de%20asistencia%20como%20${encodeURIComponent(firstName + ' ' + lastName)}%20pero%20deseo%20comunicarme%20con%20ustedes.`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="relative group overflow-hidden flex items-center justify-center gap-3 bg-gradient-to-br from-[#dfa856] via-[#e8c386] to-[#b3853f] text-[#2a1f1a] py-4 rounded-full font-sans font-bold uppercase tracking-[0.15em] text-xs transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-[0_10px_25px_rgba(223,168,86,0.3)] border border-white/20 cursor-pointer text-center"
-                  >
-                    <MessageCircle size={18} />
-                    <span>Envíenos un mensaje</span>
-                  </a>
-
-                  <button
-                    onClick={() => {
-                      setAlreadyExists(false);
-                      setFirstName("");
-                      setLastName("");
-                    }}
-                    className="border-2 border-[#dfa856]/40 text-[#b3853f] hover:bg-[#dfa856]/10 transition-all duration-300 font-sans font-bold text-xs uppercase tracking-widest py-3.5 rounded-full cursor-pointer"
-                  >
-                    Intentar con otro nombre
-                  </button>
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="success"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, type: "spring" }}
-                className="flex flex-col items-center text-center py-8 z-10"
-              >
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 10 }}
-                  className="w-16 h-16 rounded-full bg-gradient-to-br from-[#dfa856] to-[#b3853f] flex items-center justify-center text-white shadow-lg mb-6"
-                >
-                  <Check size={32} />
-                </motion.div>
-
-                <span className="font-script text-3xl text-[#dfa856] block mb-1">¡Muchas Gracias!</span>
-                <h3 className="font-serif text-2xl text-[#2a1f1a] font-bold tracking-tight mb-4">
-                  {attending === "si" ? "Confirmación Recibida" : "Respuesta Recibida"}
-                </h3>
-                
-                <p className="font-serif italic text-[#2a1f1a]/80 text-[15px] leading-relaxed max-w-xs mb-8">
-                  {attending === "si"
-                    ? "Tu confirmación ha sido guardada con éxito. ¡Estamos muy felices de que nos acompañes en nuestro gran día!"
-                    : "Lamentamos que no puedas acompañarnos, agradecemos de corazón tu respuesta."}
-                </p>
-
-                <button
-                  onClick={onBack}
-                  className="border-2 border-[#dfa856] text-[#b3853f] hover:bg-[#dfa856] hover:text-[#2a1f1a] transition-all duration-300 font-sans font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-full cursor-pointer"
-                >
-                  Regresar a la Invitación
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          </div>
 
           {/* Butterfly Accent */}
           <Butterfly className="bottom-[4%] right-[6%] text-[#b3853f] opacity-80" delay={0.5} duration={10} scale={0.7} />
